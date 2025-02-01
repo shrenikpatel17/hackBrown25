@@ -32,9 +32,13 @@ export const authSlice = createSlice({
         lastName: "",
         email: "",
         password: "",
-        courses: [],
+        stories: [],
+        points: 0,
       };
       state.token = "";
+    },
+    addStoryToUser: (state, action) => {
+      state.user.stories.push(action.payload);
     },
   },
 });

@@ -26,7 +26,7 @@ const UserSchema = new Schema(
       minlength: 5, 
     },
     stories: {
-      type: Array, // Array of {title: String, sceneParts: [...], sceneImagePrompts: [...], sceneImageURLS: [...], choices: [{choice1, choice2}, ...] }
+      type: Array, 
       default: [],
     },
     points: {

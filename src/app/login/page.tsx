@@ -1,13 +1,14 @@
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
-
+import { authActions } from '../state/reducers/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from "next/navigation";
 
 
 const SignIn: React.FC = () => {
   const router = useRouter();
-
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,14 +31,14 @@ const SignIn: React.FC = () => {
     const loggedIn = await loggedInResponse.json();
     console.log(loggedIn);
     if (loggedIn.token) {
-    //   dispatch(
-    //     authActions.setLogin({
-    //       user: loggedIn.user,
-    //       token: loggedIn.token,
-    //     })
-    //   );
+      dispatch(
+        authActions.setLogin({
+          user: loggedIn.user,
+          token: loggedIn.token,
+        })
+      );
       e.target.reset();
-      router.push("/eligibilityTable");
+      router.push("/dashboard");
     }
     else{
       console.log(loggedIn.msg);

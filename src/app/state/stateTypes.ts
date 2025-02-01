@@ -6,7 +6,7 @@ export interface User {
     lastName: string;
     email: string;
     password: string;
-    npi?: string; // Optional
+    points: string; // Optional
     // Add any admin-specific fields here
 }
 
