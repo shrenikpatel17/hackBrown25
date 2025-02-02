@@ -274,8 +274,8 @@ export default function Dashboard() {
     "Brush teeth twice a day",
     "Take breaks from screens",
     "Spend time outdoors",
-    "Eat meals with family",
-    "Stay positive and practice gratitude",
+    "Wear sunscreen when outside",
+    "Practice good posture when sitting",
   ];
 
   const [currentHabitIndex, setCurrentHabitIndex] = useState(0);
