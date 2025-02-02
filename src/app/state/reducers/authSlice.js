@@ -40,6 +40,12 @@ export const authSlice = createSlice({
     addStoryToUser: (state, action) => {
       state.user.stories.push(action.payload);
     },
+    incrementPoints: (state) => {
+      state.user.points += 10;
+    },
+    decrementPoints: (state) => {
+      state.user.points -= 5; 
+    }
   },
 });
 

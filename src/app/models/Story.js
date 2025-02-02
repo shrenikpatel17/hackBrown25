@@ -23,7 +23,7 @@ const StorySchema = new Schema(
       default: []
     },
     rhyme: {
-      type: Array,
+      type: String,
       default: ""
     }
   },
