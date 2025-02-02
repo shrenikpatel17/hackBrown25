@@ -342,20 +342,6 @@ export default function Dashboard() {
           <div className="mt-8">
             {/* Header with play button */}
             <div className="flex items-center justify-center gap-2 mb-4">
-                {/* <button
-                    onClick={togglePlay}
-                    disabled={isLoading}
-                    className="mr-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                    aria-label={isPlaying ? 'Pause' : 'Play'}
-                >
-                    {isLoading ? (
-                        <Loader2 className="w-6 h-6 animate-spin text-brown-dark-green" />
-                    ) : isPlaying ? (
-                        <Pause className="w-6 h-6 text-brown-dark-green" />
-                    ) : (
-                        <Play className="w-6 h-6 text-brown-dark-green" />
-                    )}
-                </button> */}
                 <h3 className="text-5xl font-thin text-brown-dark-green font-SpicyRice ml-6 mr-6">rhyme time</h3>
                 <button
                     onClick={togglePlay}
@@ -461,7 +447,7 @@ export default function Dashboard() {
                 className="z-20 w-20 h-20 bg-brown-dark-green rounded-lg flex items-center justify-center shadow-md hover:bg-brown-parrot-green transition-colors duration-200"
               >
                 <svg
-                  className="w-10 h-10 hover:text-brown-dark-green"
+                  className="w-10 h-10 text-brown-pale-green hover:text-brown-dark-green"
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
