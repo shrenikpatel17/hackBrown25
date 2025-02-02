@@ -140,7 +140,7 @@ const GetStarted: React.FC = () => {
 
           <p className="mt-10 text-center text-sm text-theme-blue font-RalewayMedium">
             Already have an account?{' '}
-            <a href="/login" className="font-RalewayBold leading-6 text-black hover:text-white">
+            <a href="/login" className="font-RalewayBold leading-6 text-black hover:text-black hover:underline">
               Sign In
             </a>
           </p>

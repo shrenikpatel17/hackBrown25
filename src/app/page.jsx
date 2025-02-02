@@ -2,128 +2,55 @@
 
 import Image from "next/image";
 import React, { useState, useRef, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { authActions } from '../app/state/reducers/authSlice';
 import { useRouter } from "next/navigation";
+import { LightbulbIcon, Music } from 'lucide-react';
+import brownbg from '../../public/images/brownbg.png';
+import { GiStrawberry } from 'react-icons/gi';
+import { Play, Pause, Loader2 } from 'lucide-react';
 
 
-export default function Home() {
+export default function Dashboard() {
 
-  const[userPrompt, setUserPrompt] = useState("");
-  const [loadingScenes, setLoadingScenes] = useState(false);
-  const [loadingImages, setLoadingImages] = useState(false);
-  const [buildingChoices, setBuildingChoices] = useState(false);
-  const [savingStory, setSavingStory] = useState(false);
-
-  // const user = useSelector((state) => state.auth.user)
-  // console.log(user)
-
-  // const handleStart = async () => {
-  //   try {
-  //     // Step 1: Generate prompts
-  //     setLoadingScenes(true);
-  //     const promptResponse = await fetch('/api/generatePrompts', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ userPrompt }),
-  //     });
-  
-  //     if (!promptResponse.ok) {
-  //       throw new Error('Failed to generate prompts');
-  //     }
-  
-  //     const promptData = await promptResponse.json();
-  //     console.log("Generated Prompts:", promptData.promptArray);
-  //     setLoadingScenes(false);
-  
-  //     // Step 2: Generate choices
-  //     setBuildingChoices(true);
-  //     const choicesResponse = await fetch('/api/generateChoices', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ promptArray: promptData.promptArray }),
-  //     });
-  
-  //     if (!choicesResponse.ok) {
-  //       throw new Error('Failed to generate choices');
-  //     }
-  
-  //     const choicesData = await choicesResponse.json();
-  //     console.log("Generated Choices:", choicesData.optionsArray);
-  //     setBuildingChoices(false);
-  
-  //     // Step 3: Pass promptArray to image generation API
-  //     setLoadingImages(true);
-  //     // const imageResponse = await fetch('/api/generateImgs', {
-  //     //   method: 'POST',
-  //     //   headers: {
-  //     //     'Content-Type': 'application/json',
-  //     //   },
-  //     //   body: JSON.stringify({ promptArray: promptData.promptArray }),
-  //     // });
-  
-  //     // if (!imageResponse.ok) {
-  //     //   throw new Error('Failed to generate images');
-  //     // }
-  
-  //     // const imageData = await imageResponse.json();
-  //     // console.log("Generated Image URLs:", imageData.imageUrls);
-  //     setLoadingImages(false);
-  
-  //     // Convert userPrompt to Camel Case
-  //     const camelCaseTitle = userPrompt
-  //       .split(" ")
-  //       .map((word, index) =>
-  //         index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1)
-  //       )
-  //       .join("");
-  
-  //     // Final structured object
-  //     const finalResult = {
-  //       title: camelCaseTitle,
-  //       scenePrompts: promptData.promptArray,
-  //       sceneImageURLs: imageData.imageUrls,
-  //       choices: choicesData.optionsArray,
-  //     };
-  
-  //     console.log("Final Output:", finalResult);
-  //     return finalResult;
-  
-  //   } catch (error) {
-  //     console.error('Error in handleStart:', error);
-  //     return "Error generating prompts, choices, or images. Please try again.";
-  //   }
-  // };
-  
+  const router = useRouter();
 
   return (
    <>
-   <div className="relative min-h-screen overflow-y-auto overflow-x-hidden">
-   <h1 className="text-xl">HealthyTales</h1>
-
-   {/* <input
-      type="text"
-      value={userPrompt}
-      onChange={(e) => setUserPrompt(e.target.value)}
-      placeholder="Learn about..."
-      className="w-1/4 mt-4 text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
-      required
-    />
-
-    <button
-      onClick={() => handleStart()}
-      className={`w-1/6 mt-8 flex justify-center py-3 px-3 border border-transparent rounded-xl text-sm font-medium text-white bg-black hover:bg-white hover:text-black`}
-    >
-      Start
-    </button> */}
-
     
+   <div className="relative w-screen h-screen">
+      <Image 
+        src={brownbg} 
+        alt="Background" 
+        className="absolute top-0 left-0 w-full h-full object-cover"
+      />
 
-   </div>
+      <div className="relative z-10 flex flex-col items-center justify-center h-full">
+        <div className="bg-brown-pale-green/75 backdrop-blur-sm border border-brown-dark-green border-2 rounded-xl p-8 w-[400px]">
+          <h1 className="text-5xl font-SpicyRice text-brown-dark-green mb-6 text-center">
+            healthytales
+          </h1>
+
+          <div className="mb-6">
+            <div className="relative">
+              <p className="font-Barlow text-md text-brown-dark-green">Learn healthy habits through gamified stories!</p>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              </div>
+            </div>
+          </div>
+          <div className='flex items-center justify-center'>
+            <button 
+              onClick={() => router.push('./signup')}
+              className="w-3/4 mr-4 hover:bg-brown-parrot-green font-SpicyRice text-xl hover:text-brown-dark-green bg-brown-dark-green text-white py-[.45rem] rounded-lg transition-colors duration-200">
+              signup
+            </button>
+            <button 
+              onClick={() => router.push('./login')}
+              className="w-3/4 hover:bg-brown-parrot-green font-SpicyRice text-xl hover:text-brown-dark-green border border-2 border-brown-dark-green text-brown-dark-green py-[.45rem] rounded-lg transition-colors duration-200">
+              login
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
    </>
   );
 }
