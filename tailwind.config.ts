@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         SpicyRice: ["SpicyRice"],
+        Barlow: ["Barlow"],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

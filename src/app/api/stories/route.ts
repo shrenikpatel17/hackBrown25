@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 export async function POST( req: Request ) {
     try {
-        const { userID, title, scenePrompts, sceneImageURLs, choices } = await req.json();
+        const { userID, title, scenePrompts, sceneImageURLs, choices, lessons, rhyme } = await req.json();
         
         await connectMongoDB();
 
@@ -15,6 +15,8 @@ export async function POST( req: Request ) {
             scenePrompts: scenePrompts,
             sceneImageURLs: sceneImageURLs,
             choices: choices,
+            lessons: lessons,
+            rhyme: rhyme,
         };
 
         const newStory = await Story.create(newStoryObject);

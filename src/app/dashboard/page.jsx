@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { LightbulbIcon, Music } from 'lucide-react';
 import brownbg from '../../../public/images/brownbg.png';
 import { GiStrawberry } from 'react-icons/gi';
+import { Play, Pause, Loader2 } from 'lucide-react';
 
 
 export default function Dashboard() {
@@ -21,6 +22,74 @@ export default function Dashboard() {
   const [createdStoryID, setCreatedStoryID] = useState("");
   const [generalLoading, setGeneralLoading] = useState(false);
   const [allStories, setAllStories] = useState(null);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef(new Audio());
+
+  const playAudio = async () => {
+    try {
+        setIsLoading(true);
+        
+        // Stop any existing audio
+        audioRef.current.pause();
+        if (audioRef.current.src) {
+            URL.revokeObjectURL(audioRef.current.src);
+            audioRef.current.src = '';
+        }
+
+        // Create the audio source (in a real app, you may fetch this from your backend)
+        const response = await fetch('/api/readAloud', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: modalContent.rhyme }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate speech');
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        audioRef.current.src = audioUrl;
+        audioRef.current.onended = () => {
+            setIsPlaying(false);
+            URL.revokeObjectURL(audioUrl);
+        };
+
+        await audioRef.current.play();
+        setIsPlaying(true);
+        } catch (error) {
+            console.error('Error playing audio:', error);
+            setIsPlaying(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const togglePlay = () => {
+        if (isPlaying) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            playAudio();
+        }
+    };
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                if (audioRef.current.src) {
+                    URL.revokeObjectURL(audioRef.current.src);
+                }
+            }
+        };
+    }, []);
 
   const user = useSelector((state) => state.auth.user);
   const router = useRouter();
@@ -270,18 +339,47 @@ export default function Dashboard() {
             ))}
           </div>
   
-            <div className="mt-8">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Music className="w-8 h-8 text-brown-dark-green font-SpicyRice" />
+          <div className="mt-8">
+            {/* Header with play button */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+                {/* <button
+                    onClick={togglePlay}
+                    disabled={isLoading}
+                    className="mr-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                    {isLoading ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-brown-dark-green" />
+                    ) : isPlaying ? (
+                        <Pause className="w-6 h-6 text-brown-dark-green" />
+                    ) : (
+                        <Play className="w-6 h-6 text-brown-dark-green" />
+                    )}
+                </button> */}
                 <h3 className="text-5xl font-thin text-brown-dark-green font-SpicyRice ml-6 mr-6">rhyme time</h3>
-                <Music className="w-8 h-8 text-brown-dark-green font-SpicyRice" />
-              </div>
-              <div className="text-brown-dark-green font-SpicyRice text-md space-y-2">
-                {modalContent.rhyme.split('\n').map((line, index) => (
-                  <p key={"rhymeLine" + index} className="text-center">{line}</p>
-                ))}
-              </div>
+                <button
+                    onClick={togglePlay}
+                    disabled={isLoading}
+                    className="ml-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                    {isLoading ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-brown-dark-green" />
+                    ) : isPlaying ? (
+                        <Pause className="w-6 h-6 text-brown-dark-green" />
+                    ) : (
+                        <Play className="w-6 h-6 text-brown-dark-green" />
+                    )}
+                </button>
             </div>
+
+              {/* Rhyme Text */}
+              <div className="text-brown-dark-green font-SpicyRice text-md space-y-2">
+                  {modalContent.rhyme.split('\n').map((line, index) => (
+                      <p key={"rhymeLine" + index} className="text-center">{line}</p>
+                  ))}
+              </div>
+          </div>
         </div>
       </div>
     );
@@ -304,7 +402,6 @@ export default function Dashboard() {
       </div>
     )}
     
-
    <div className="relative w-screen h-screen">
       <Image 
         src={brownbg} 
@@ -357,30 +454,33 @@ export default function Dashboard() {
           <>
           {allStories.map((story, index) => (
             <>
-            <button
-              key={index}
-              onClick={() => { setModalContent(story); setIsModalOpen(true); }}
-              className="z-20 w-20 h-20 bg-brown-dark-green rounded-lg flex items-center justify-center shadow-md hover:bg-brown-parrot-green transition-colors duration-200"
-            >
-              <svg
-                className="w-10 h-10 hover:text-brown-dark-green"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            <div className="flex flex-col items-center">
+              <button
+                key={index}
+                onClick={() => { setModalContent(story); setIsModalOpen(true); }}
+                className="z-20 w-20 h-20 bg-brown-dark-green rounded-lg flex items-center justify-center shadow-md hover:bg-brown-parrot-green transition-colors duration-200"
               >
-                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </button>
-            <button
-              key={index}
-              onClick={() => { router.push(`/story/${story._id}`); }}
-              className="z-20"
-            >
-              Redo
-            </button>
+                <svg
+                  className="w-10 h-10 hover:text-brown-dark-green"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </button>
+              <button
+                key={index}
+                onClick={() => { router.push(`/story/${story._id}`); }}
+                className="z-20 text-brown-dark-green mt-2 px-3 py-1 border border-brown-dark-green border-1 hover:bg-white/50 hover:text-brown-dark-green font-Barlow rounded-lg"
+              >
+                Redo
+              </button>
+            </div>
+
             </>
           ))}
           </>

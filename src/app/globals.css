@@ -28,3 +28,8 @@ body {
   font-family: "SpicyRice";
   src: url("./fonts/SpicyRice-Regular.ttf");
 }
+
+@font-face {
+  font-family: "Barlow";
+  src: url("./fonts/Barlow-Medium.ttf");
+}

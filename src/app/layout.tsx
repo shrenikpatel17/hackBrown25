@@ -12,6 +12,12 @@ const geistSans = localFont({
   weight: "100 900",
 });
 
+const geistMono = localFont({
+  src: "fonts/Barlow-Medium.ttf",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+
 export const metadata: Metadata = {
   title: "HealthyTales",
   description: "Learn healhty habits :)",
@@ -24,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} antialiased`}><Providers>{children}</Providers></body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}><Providers>{children}</Providers></body>
     </html>
   );
 }

@@ -103,7 +103,7 @@ const SignIn: React.FC = () => {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-2xl bg-theme-blue px-3 py-1.5 text-sm font-RalewayMedium leading-6 text-white shadow-sm hover:bg-hover-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="flex w-full justify-center rounded-2xl bg-black px-3 py-1.5 text-sm font-RalewayMedium leading-6 text-white shadow-sm hover:bg-hover-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Sign in
               </button>

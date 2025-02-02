@@ -5,13 +5,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { authActions } from '../../state/reducers/authSlice';
 import { useRouter } from "next/navigation";
+import { Play, Pause, Loader2 } from 'lucide-react';
 
 export default function StoryPage({params}) {
     const storyID = (params).slug
     const user = useSelector((state) => state.auth.user);
     const dispatch = useDispatch();
     const router = useRouter();
-
 
     const [activeStory, setActiveStory] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,6 +20,9 @@ export default function StoryPage({params}) {
     const [lastChoiceWasHealthy, setLastChoiceWasHealthy] = useState(false);
     const [totalPointsEarned, setTotalPointsEarned] = useState(0);
     const [showFinalScreen, setShowFinalScreen] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const audioRef = useRef(new Audio());
 
     useEffect(() => {
         if(!user) {
@@ -48,7 +51,6 @@ export default function StoryPage({params}) {
     }
     fetchStories();
     }, [user, storyID])
-
 
     const handleChoice = (isHealthy) => {
         setShowFeedback(true);
@@ -89,7 +91,82 @@ export default function StoryPage({params}) {
         } else {
             setShowFinalScreen(true);
         }
-    };    
+    };
+
+    const playAudio = async () => {
+        try {
+            setIsLoading(true);
+            
+            // Stop any existing audio and clear the source
+            audioRef.current.pause();
+            if (audioRef.current.src) {
+                URL.revokeObjectURL(audioRef.current.src);
+                audioRef.current.src = '';
+            }
+            
+            const response = await fetch('/api/readAloud', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: activeStory.scenePrompts[currentIndex] }),
+            });
+        
+            if (!response.ok) {
+                throw new Error('Failed to generate speech');
+            }
+        
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+        
+            audioRef.current.src = audioUrl;
+            audioRef.current.onended = () => {
+                setIsPlaying(false);
+                URL.revokeObjectURL(audioUrl);
+            };
+        
+            await audioRef.current.play();
+            setIsPlaying(true);
+        } catch (error) {
+            console.error('Error playing audio:', error);
+            setIsPlaying(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    const togglePlay = () => {
+        if (isPlaying) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            playAudio();
+        }
+    };
+
+
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                if (audioRef.current.src) {
+                    URL.revokeObjectURL(audioRef.current.src);
+                }
+            }
+        };
+    }, []);
+      
+      // Clean up audio when scene changes
+      useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+            if (audioRef.current.src) {
+                URL.revokeObjectURL(audioRef.current.src);
+                audioRef.current.src = '';
+            }
+        }
+    }, [currentIndex]);
 
     console.log(activeStory)
 
@@ -99,21 +176,21 @@ export default function StoryPage({params}) {
             <div className="text-center">
               {isCorrect ? (
                 <div className="animate-score-bounce">
-                  <span className="text-green-400 text-8xl font-bold">+10</span>
+                  <span className="text-brown-parrot-green text-8xl font-SpicyRice font-bold">+10</span>
                 </div>
               ) : (
                 <div className="space-y-6">
                   <div className="animate-score-bounce">
-                    <span className="text-red-400 text-8xl font-bold">-5</span>
+                    <span className="text-red-400 text-8xl font-SpicyRice font-bold">-5</span>
                   </div>
-                  <div className="bg-white/20 p-4 rounded-lg max-w-md mx-auto mt-4">
-                    <p className="text-white text-xl mb-2">The healthy choice was:</p>
-                    <p className="text-green-400 text-xl">{correctAnswer}</p>
+                  <div className="bg-white/80 p-4 rounded-lg max-w-md mx-auto mt-4">
+                    <p className="text-brown-dark-green text-xl mb-2 font-SpicyRice">The healthy choice was:</p>
+                    <p className="text-green-800 text-xl font-medium font-Barlow">{correctAnswer}</p>
                   </div>
                   <button
                     onClick={onContinue}
-                    className="mt-4 px-6 py-2 bg-white/30 hover:bg-white/50 
-                             text-white rounded-lg transition-colors duration-200"
+                    className="mt-4 px-6 py-2 bg-white/50 hover:bg-brown-pale-green hover:text-brown-dark-green
+                             text-white rounded-lg font-Barlow font-bold transition-colors duration-200"
                   >
                     Continue
                   </button>
@@ -128,22 +205,24 @@ export default function StoryPage({params}) {
         const pointsColor = totalPoints > 0 ? 'text-green-500' : 'text-red-500';
     
         return (
+            <>
             <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-                <div className="bg-white p-6 rounded-lg text-center max-w-sm">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Story Completed!</h2>
-                    <p className="text-lg text-gray-700">Points Earned: 
-                        <span className={`font-semibold ${pointsColor}`}>
-                            {totalPoints}
+                <div className="bg-white p-6 rounded-lg text-center max-w-md">
+                    <h2 className="text-2xl font-bold font-SpicyRice text-brown-dark-green mb-4">Story Completed!</h2>
+                    <p className="text-lg mt-8 text-gray-700 font-Barlow">
+                        <span className={`font-semibold font-Barlow ${pointsColor}`}>
+                            {totalPoints} points
                         </span>
                     </p>
                     <button
                         onClick={() => router.push(`/dashboard`)}
-                        className="mt-4 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
+                        className="mt-8 px-6 py-2 bg-transparent border border-brown-dark-green border-1 hover:bg-brown-dark-green hover:text-white font-Barlow text-brown-dark-green rounded-lg transition-colors duration-200"
                     >
                         Home
                     </button>
                 </div>
             </div>
+            </>
         );
     };
     
@@ -165,10 +244,26 @@ export default function StoryPage({params}) {
             <div className="relative z-10 flex flex-col min-h-screen p-6">
                 {/* Scene Prompt Box */}
                 <div className="mx-auto w-full max-w-3xl mt-8 mb-auto">
-                <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg py-4 px-6 transition-all duration-500">
-                    <p className="text-lg text-center text-gray-800">
-                    {activeStory.scenePrompts[currentIndex]}
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg py-4 px-6 transition-all duration-500 border border-brown-dark-green border-2">
+                <div className="flex items-center">
+                    <button
+                        onClick={togglePlay}
+                        disabled={isLoading}
+                        className="mr-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        aria-label={isPlaying ? 'Pause' : 'Play'}
+                    >
+                        {isLoading ? (
+                            <Loader2 className="w-6 h-6 animate-spin text-brown-dark-green" />
+                        ) : isPlaying ? (
+                            <Pause className="w-6 h-6 text-brown-dark-green" />
+                        ) : (
+                            <Play className="w-6 h-6 text-brown-dark-green" />
+                        )}
+                    </button>
+                    <p className="text-brown-dark-green font-Barlow font-bold text-lg text-center">
+                        {activeStory.scenePrompts[currentIndex]}
                     </p>
+                </div>
                 </div>
                 </div>
 
@@ -179,9 +274,9 @@ export default function StoryPage({params}) {
                     <div 
                     onClick={() => handleChoice(isHealthyOnLeft)}
                     className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 
-                                transition-all duration-300 hover:scale-105 cursor-pointer"
+                                transition-all duration-300 hover:scale-105 cursor-pointer border-brown-dark-green border-2 text-center hover:bg-brown-pale-green"
                     >
-                    <p className="text-gray-800">
+                    <p className="text-brown-dark-green font-Barlow font-bold">
                         {isHealthyOnLeft ? activeStory.choices[currentIndex].healthy : activeStory.choices[currentIndex].unhealthy}
                     </p>
                     </div>
@@ -192,9 +287,9 @@ export default function StoryPage({params}) {
                     <div 
                     onClick={() => handleChoice(!isHealthyOnLeft)}
                     className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-4 
-                                transition-all duration-300 hover:scale-105 cursor-pointer"
+                                transition-all duration-300 hover:scale-105 cursor-pointer border-brown-dark-green border-2 text-center hover:bg-brown-pale-green"
                     >
-                    <p className="text-gray-800">
+                    <p className="text-brown-dark-green font-Barlow font-bold">
                         {isHealthyOnLeft ? activeStory.choices[currentIndex].unhealthy : activeStory.choices[currentIndex].healthy}
                     </p>
                     </div>
